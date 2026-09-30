@@ -1,0 +1,53 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [dev, realize, main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: fitanalytics
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: fitanalytics
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U fitanalytics"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      DATABASE_URL: postgresql+psycopg://fitanalytics:test_password@localhost:5432/fitanalytics
+      SESSION_SECRET: ci-secret-at-least-thirty-two-characters
+      DEMO_PASSWORD: ExamplePassword123!
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m pytest -q
+      - run: python -m alembic upgrade head
+      - run: python -m alembic check
+      - run: python -m scripts.seed_demo
+      - name: Comprobar la conexión y el inicio de sesión en PostgreSQL
+        run: |
+          python - <<'PY'
+          from fastapi.testclient import TestClient
+          from app.main import app
+          with TestClient(app) as client:
+              assert client.get('/api/salud').json() == {'estado': 'ok'}
+              token = client.get('/api/auth/csrf').json()['csrf_token']
+              response = client.post('/api/auth/ingreso', headers={'X-CSRF-Token': token}, json={
+                  'correo': 'demo@example.com', 'clave': 'ExamplePassword123!'})
+              assert response.status_code == 200, response.text
+              assert response.json()['usuario']['perfil_completo']
+          PY
