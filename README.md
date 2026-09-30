@@ -52,7 +52,7 @@ Después de migrar, define `DEMO_PASSWORD` con al menos 12 caracteres y ejecuta:
 python -m scripts.seed_demo
 ```
 
-Esto crea `demo@fitanalytics.local`, ocho semanas ficticias de sentadilla y una meta de 50 kg. Es un comando explícito: las cuentas nuevas no heredan esos registros. La segunda ejecución se detiene sin duplicar datos. No uses una contraseña demo pública en un despliegue abierto.
+Esto crea `demo@example.com`, ocho semanas ficticias de sentadilla y una meta de 50 kg. Es un comando explícito: las cuentas nuevas no heredan esos registros. La segunda ejecución se detiene sin duplicar datos. No uses una contraseña demo pública en un despliegue abierto.
 
 ## Orden de llamadas de la futura interfaz
 

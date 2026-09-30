@@ -19,12 +19,12 @@ def seed():
     if len(password) < 12:
         raise SystemExit("Define DEMO_PASSWORD con al menos 12 caracteres")
     with Session(engine()) as db:
-        if db.scalar(select(Usuario).where(Usuario.correo == "demo@fitanalytics.local")):
+        if db.scalar(select(Usuario).where(Usuario.correo == "demo@example.com")):
             raise SystemExit("La cuenta demo ya existe; no se duplicaron datos")
         exercise = db.scalar(select(Ejercicio).where(Ejercicio.nombre == "Sentadilla"))
         if exercise is None:
             raise SystemExit("Ejecuta primero: alembic upgrade head")
-        user = Usuario(nombre="Cuenta demostración", correo="demo@fitanalytics.local",
+        user = Usuario(nombre="Cuenta demostración", correo="demo@example.com",
                        clave_hash=hasher.hash(password), edad=25, talla_m=Decimal("1.75"),
                        objetivo="Mejorar mi fuerza en sentadilla")
         db.add(user)
@@ -41,7 +41,7 @@ def seed():
                                                repeticiones=8, carga_kg=Decimal(weight)))
             db.add(session)
         db.commit()
-    print("Cuenta demo creada: demo@fitanalytics.local; ocho semanas de datos sintéticos")
+    print("Cuenta demo creada: demo@example.com; ocho semanas de datos sintéticos")
 
 
 if __name__ == "__main__":

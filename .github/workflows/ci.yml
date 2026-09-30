@@ -47,7 +47,7 @@ jobs:
               assert client.get('/api/salud').json() == {'estado': 'ok'}
               token = client.get('/api/auth/csrf').json()['csrf_token']
               response = client.post('/api/auth/ingreso', headers={'X-CSRF-Token': token}, json={
-                  'correo': 'demo@fitanalytics.local', 'clave': 'ExamplePassword123!'})
+                  'correo': 'demo@example.com', 'clave': 'ExamplePassword123!'})
               assert response.status_code == 200, response.text
               assert response.json()['usuario']['perfil_completo']
           PY
